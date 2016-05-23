@@ -5,8 +5,8 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
-import com.jary.naruto.common.dao.BaseMapper;
-import com.jary.naruto.common.model.BaseEntity;
+import com.jary.framework.core.dao.BaseMapper;
+import com.jary.framework.core.entity.BaseEntity;
 
 /**
  * @Description: 基础service,主要操作crud模版功能

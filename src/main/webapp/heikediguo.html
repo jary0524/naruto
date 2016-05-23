@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" href="static/css/jary.css">
+
+
+<style>
+#canvas {
+	width: 100%;
+	height: 100%;
+}
+</style>
+</head>
+<body>
+<canvas id="canvas">
+</canvas>
+<script type="text/javascript">
+
+canvas.height = window.screen.height;
+canvas.width = window.screen.width;
+
+var columns = [];
+var character =0;
+for (i = 0; i < 256; columns[i++] = 1);
+
+
+function step() {
+    canvas.getContext('2d').fillStyle = 'rgba(0,0,0,0.05)';
+    canvas.getContext('2d').fillRect(0, 0, canvas.width, canvas.height);
+    
+
+    canvas.getContext('2d').fillStyle = '#0F0';
+ 
+    columns.map(function (value, index) {
+         
+         
+  
+        canvas.getContext('2d').fillText(character, //text
+                                         index * 10, //x
+                                         value //y
+                                        );
+      if(character==0)  
+      character=1;
+      else
+        character=0;
+      columns[index] = value > 758 + Math.random() * 1e4 ? 0 : value + 10;
+    });
+}
+
+setInterval(step, 33);
+</script>
+</body>
+</html>

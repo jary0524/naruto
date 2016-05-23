@@ -15,6 +15,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
 	<%-- <base href="<%=basePath%>"> --%>
+    <link rel="icon" href="<%=basePath%>static/images/icon/favicon.ico">
 	
     <!-- 新 Bootstrap 核心 CSS 文件 -->
 	<link rel="stylesheet" href="<%=basePath%>static/bootstrap-3.3.5/css/bootstrap.min.css">
@@ -33,11 +34,11 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 <body class="bg-body">
 	<div class="background-container">
 		<div style="margin:5px 0 0 10px;">
-			<a href="<%=basePath%>login/logout.shtml">点击退出</a>	
+			<a href="<%=basePath%>logout.shtml">点击退出</a>	
 		</div>
 		
 		<div class="signin">
-			<div class="signin-head"><img src="<%=basePath%>static/images/head_120.png" alt="" class="img-circle"></div>
+			<div class="signin-head"><img src="<%=basePath%>static/images/naruto/naruto_002.jpg" alt="" class="img-circle" style="height: 120px; width: 120px; "></div>
 			<div class="error">${error}</div>
 			<form class="form-signin" role="form" id="loginForm" action="<%-- <%=basePath%>login/login.shtml --%>" method="post">
 				<input type="text" name="username" value="<shiro:principal/>" class="form-control" placeholder="用户名" required autofocus />

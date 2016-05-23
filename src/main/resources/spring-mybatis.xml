@@ -85,10 +85,10 @@
 		会扫描org.mybatis.spring.sample.mapper下的所有接口，然后创建各自接口的动态代理类
 	-->
 	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
-		<property name="basePackage" value="com.jary.test.springmvc" />
+		<property name="basePackage" value="com.jary.naruto" />
 		<property name="sqlSessionFactoryBeanName" value="sqlSessionFactory" />
 		<!-- markerInterface：基于接口的过滤器，实现了该接口的dao才会被扫描器扫描，与basePackage是与的作用。 -->
-		<property name="markerInterface" value="com.jary.naruto.common.dao.BaseMapper" />
+		<property name="markerInterface" value="com.jary.framework.core.dao.BaseMapper" />
 	</bean>
 
 	<!-- 配置事务管理器 -->
@@ -142,7 +142,7 @@
 	<bean id="druid-stat-pointcut" class="org.springframework.aop.support.JdkRegexpMethodPointcut" scope="prototype">
 		<property name="patterns">
 			<list>
-				<value>com.jary.test.springmvc</value>
+				<value>com.jary.naruto</value>
 			</list>
 		</property>
 	</bean>

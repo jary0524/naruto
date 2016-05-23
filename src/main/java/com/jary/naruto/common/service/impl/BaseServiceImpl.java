@@ -9,7 +9,7 @@ import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
 
-import com.jary.naruto.common.model.BaseEntity;
+import com.jary.framework.core.entity.BaseEntity;
 import com.jary.naruto.common.service.BaseService;
 
 

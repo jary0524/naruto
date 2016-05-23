@@ -6,8 +6,7 @@
 	<context-param>
 		<param-name>contextConfigLocation</param-name>
 		<param-value>classpath:beans.xml,
-            classpath:spring-mybatis.xml,
-            classpath*:applicationContext-*.xml
+            classpath*:spring-*.xml
         </param-value>
 	</context-param>
 	<listener>
@@ -40,39 +39,20 @@
 	<listener>
 		<listener-class>org.springframework.web.util.Log4jConfigListener</listener-class>
 	</listener>
-
-	<!-- DefaultServlet默认的servlet是既服务于静态资源又服务于目录列表(如果允许目录列表的话)的servlet。 -->
-	<!-- 默认servlet 在webapp启动时被  装载 -->
-	<!-- 
-	<servlet>
-        <servlet-name>default</servlet-name>
-        <servlet-class>
-          org.apache.catalina.servlets.DefaultServlet
-        </servlet-class>
-        <init-param>
-            <param-name>debug</param-name>
-            <param-value>0</param-value>
-        </init-param>
-        <init-param>
-            <param-name>listings</param-name>
-            <param-value>false</param-value>
-        </init-param>
-        <load-on-startup>1</load-on-startup>
-    </servlet>
-     -->
-    <!-- 可配置多个 -->
-	<servlet-mapping>
-		<servlet-name>default</servlet-name>
-		<url-pattern>/static/*</url-pattern>
-	</servlet-mapping>
-	<servlet-mapping>
-		<servlet-name>default</servlet-name>
-		<url-pattern>/images/*</url-pattern>
-	</servlet-mapping>
-	<servlet-mapping>
-		<servlet-name>default</servlet-name>
-		<url-pattern>/template/*</url-pattern>
-	</servlet-mapping>
+	
+	<!-- shiro -->
+	<filter>
+		<filter-name>shiroFilter</filter-name>
+		<filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
+		<init-param>
+			<param-name>targetFilterLifecycle</param-name>
+			<param-value>true</param-value>
+		</init-param>
+	</filter>
+	<filter-mapping>
+		<filter-name>shiroFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
 
 	<servlet>
 		<servlet-name>springDispatcherServlet</servlet-name>
