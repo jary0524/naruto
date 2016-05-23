@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.0.xsd
+		http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-4.0.xsd">
+
+	<!--  
+		需要进行 Spring 整合 SpringMVC 吗 ?
+		还是否需要再加入 Spring 的 IOC 容器 ?
+		是否需要再 web.xml 文件中配置启动 Spring IOC 容器的 ContextLoaderListener ?
+		
+		1. 需要: 通常情况下, 类似于数据源, 事务, 整合其他框架都是放在 Spring 的配置文件中(而不是放在 SpringMVC 的配置文件中).
+		实际上放入 Spring 配置文件对应的 IOC 容器中的还有 Service 和 Dao. 
+		2. 不需要: 都放在 SpringMVC 的配置文件中. 也可以分多个 Spring 的配置文件, 然后使用 import 节点导入其他的配置文件
+	-->
+	
+	<!--  
+		问题: 若 Spring 的 IOC 容器和 SpringMVC 的 IOC 容器扫描的包有重合的部分, 就会导致有的 bean 会被创建 2 次.
+		解决:
+		1. 使 Spring 的 IOC 容器扫描的包和 SpringMVC 的 IOC 容器扫描的包没有重合的部分. 
+		2. 使用 exclude-filter 和 include-filter 子节点来规定只能扫描的注解
+	-->
+	
+	<!--  
+		SpringMVC 的 IOC 容器中的 bean 可以来引用 Spring IOC 容器中的 bean. 
+		返回来呢 ? 反之则不行. Spring IOC 容器中的 bean 却不能来引用 SpringMVC IOC 容器中的 bean!
+	-->
+	<!-- 配置自定扫描的包 -->	
+	<context:component-scan base-package="com.jary.naruto" use-default-filters="false">
+		<context:include-filter type="annotation" 
+			expression="org.springframework.stereotype.Controller"/>
+		<context:include-filter type="annotation" 
+			expression="org.springframework.web.bind.annotation.ControllerAdvice"/>
+	</context:component-scan>
+	
+	
+    <!-- 对静态资源文件的访问  不支持访问WEB-INF目录   方案一 （二选一） -->
+		<!--  
+			default-servlet-handler 将在 SpringMVC 上下文中定义一个 DefaultServletHttpRequestHandler,
+			它会对进入 DispatcherServlet 的请求进行筛查, 如果发现是没有经过映射的请求, 就将该请求交由 WEB 应用服务器默认的 
+			Servlet 处理. 如果不是静态资源的请求，才由 DispatcherServlet 继续处理
+	
+			一般 WEB 应用服务器默认的 Servlet 的名称都是 default.
+			若所使用的 WEB 服务器的默认 Servlet 名称不是 default，则需要通过 default-servlet-name 属性显式指定
+			
+		-->
+	<!-- 访问项目时，首先走默认的 web.xml 配置的servlet，没有的话才找对应controller -->
+	<mvc:default-servlet-handler/>
+      
+    <!-- 对静态资源文件的访问  支持访问WEB-INF目录    方案二 （二选一）-->
+    <!-- 
+    <mvc:resources mapping="/resources/**" location="/resources/" />
+     -->
+	
+	<!-- 支持spring3.0新的mvc注解 -->
+	<mvc:annotation-driven></mvc:annotation-driven>
+	
+	<!-- 启动Spring MVC的注解功能，完成请求和注解POJO的映射 -->
+	<!-- <bean class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter"/> -->
+
+	<!-- 配置视图解析器 -->
+	<!-- 配置视图  BeanNameViewResolver 解析器: 使用视图的名字来解析视图 -->
+	<!-- 通过 order 属性来定义视图解析器的优先级, order 值越小优先级越高  InternalResourceViewResolver的order默认为 Integer.MAX_VALUE-->
+	<bean class="org.springframework.web.servlet.view.BeanNameViewResolver">
+		<property name="order" value="100"></property>
+	</bean>
+	<!-- 定义Spring MVC 的模板文件 -->  
+    <bean id="viewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver">  <!-- 默认的是InternalResourceViews -->
+       <property name="viewClass" value="org.springframework.web.servlet.view.JstlView"/>     <!-- 支持JSTL -->  
+       <property name="prefix" value="/WEB-INF/jsp/" />              <!-- 模板的路径 -->  
+       <property name="suffix" value=".jsp" />                <!-- 模板文件的后缀-->  
+    </bean>
+    
+	<!-- 配置 MultipartResolver  实现文件上传功能 -->
+	<!-- 自定义，实现文件上传进度 -->
+	<bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+	    <property name="defaultEncoding" value="UTF-8"></property><!-- 默认编码 (ISO-8859-1) -->
+		<property name="maxUploadSize" value="1024000"></property><!-- 最大内存大小 (10240) -1为无限止(-1) -->
+		<property name="uploadTempDir" value="/temp/" /> <!--(临时文件存储目录) 上传后的目录名 (WebUtils#TEMP_DIR_CONTEXT_ATTRIBUTE) -->
+	</bean>
+		
+	<!-- 基于Cookie的本地化解析器 -->
+	<bean id="localeResolver" class="org.springframework.web.servlet.i18n.CookieLocaleResolver">
+		<property name="cookieMaxAge" value="604800"/>
+		<property name="defaultLocale" value="zh_CN"/>
+		<property name="cookieName" value="Language"></property>
+	</bean>
+	<!-- 基于Session的本地化解析器 -->
+	<!--<bean id="localeResolver" class="org.springframework.web.servlet.i18n.SessionLocaleResolver" />-->
+	
+    <!-- 拦截器 -->
+	<mvc:interceptors>
+	
+		<!-- 配置自定义的拦截器 -->
+		<!-- <bean class="com.atguigu.springmvc.interceptors.FirstInterceptor"></bean> -->
+		
+		<!-- 配置拦截器(不)作用的路径 --><!-- 
+		<mvc:interceptor>
+			<mvc:mapping path="/emps"/>
+			<bean class="com.atguigu.springmvc.interceptors.SecondInterceptor"></bean>
+		</mvc:interceptor> -->
+		
+		<!-- 配置 LocaleChanceInterceptor 实现国际化语言切换  -->
+		<bean class="org.springframework.web.servlet.i18n.LocaleChangeInterceptor"></bean>
+	</mvc:interceptors>
+    
+	<bean id="stringConverter" class="org.springframework.http.converter.StringHttpMessageConverter">  
+        <property name="supportedMediaTypes">  
+            <list>  
+                <value>text/plain;charset=UTF-8</value>  
+            </list>  
+        </property>  
+    </bean>  
+
+	<!-- 避免IE在ajax请求时，返回json出现下载 -->    
+    <!-- Jackson转换器 -->
+    <!-- <bean id="mappingJacksonHttpMessageConverter" class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter" /> -->
+      
+    <!-- fastjson转换器 -->
+    <bean id="fastJsonHttpMessageConverter"  class="com.alibaba.fastjson.support.spring.FastJsonHttpMessageConverter">
+    	<property name="supportedMediaTypes">
+            <list>
+                <value>application/json;charset=UTF-8</value>
+                <value>text/plain;charset=UTF-8</value>
+                <value>text/html;charset=UTF-8</value>
+                <value>text/json;charset=UTF-8</value>
+            </list>
+        </property>
+    </bean>
+    
+    <!-- 
+		在 spring-mvc.xml 配置文件中显式定义了一个AnnotationMethodHandlerAdapter bean，
+		这时就必须配置该 bean 的messageConverters 了，因为手动指定了 AnnotationMethodHandlerAdapter 后，
+		默认的自动配置就不生效了。我们只需去掉自己额外手动添加的 AnnotationMethodHandlerAdapter bean 
+		或是 配置该 bean 的 messageConverters 指定 supportedMediaTypes 就可以了
+     -->
+    <bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter"  >   
+        <property name="messageConverters">  
+           <list>
+           	  <!-- <ref bean="mappingJacksonHttpMessageConverter"/> -->
+              <ref bean="fastJsonHttpMessageConverter" /><!-- json转换器   -->
+           </list>  
+        </property>  
+    </bean>
+	
+	<!-- 配置使用 SimpleMappingExceptionResolver 来映射异常 -->
+	<bean class="org.springframework.web.servlet.handler.SimpleMappingExceptionResolver">
+		<property name="exceptionAttribute" value="ex"></property>
+		<property name="exceptionMappings">
+			<props>
+				<prop key="java.lang.ArrayIndexOutOfBoundsException">error</prop>
+			</props>
+		</property>
+	</bean>
+	
+</beans>

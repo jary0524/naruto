@@ -51,8 +51,7 @@
 			<artifactId>core</artifactId>
 			<version>0.0.1</version>
 		</dependency>
-	
-	
+
 		<!-- 单元测试环境 -->
 		<dependency>
 			<groupId>junit</groupId>
